@@ -10,30 +10,45 @@ class MinHeapSearch
         visited = Set.new
         stack = []
 
-        # visit the root
-        visited << 0
+        # Start with the root
+        current_position = 0
         stack << 0
+        visited << 0
 
-        while 1
-            current_position = stack.last
-            # check if current position has the value, return index
-            return current_position if @min_heap.heap[current_position] == value
+        while stack.any?
+            puts "check adj: #{@min_heap.heap[current_position]}"
+            adjascent_unvisited = getAdjascentUnvisitedNode(current_position, visited)
 
-            # check if we've visited every node, return -1
-            return -1 if @min_heap.heap.size == visited.size
+            if adjascent_unvisited
+                # haven't visited, push and visit and make new current
+                current_position = adjascent_unvisited
+                puts "has adj: #{@min_heap.heap[current_position]}"
 
-            left = @min_heap.left(current_position)
-            right = @min_heap.right(current_position)
-            if left && !visited.include?(left) # If left unvisited, move to the left
-                visited << left
-                stack << left
-            elsif right && !visited.include?(right) # If right unvisited, move to the right
-                visited << right
-                stack << right
-            else # Hit the bottom of branch, pop
-                stack.pop
+                stack << current_position 
+                visited << current_position
+            else
+                # We've hit the bottom, check and pop
+                current_position = stack.pop Because we pop when we get to the top, stack is empty and exits while loop and doesnt go to the right side
+                puts "has no adj, checking: #{@min_heap.heap[current_position]}"
+
+                return current_position if @min_heap.heap[current_position] == value
+
+                puts "#{@min_heap.heap[current_position]} was not the value"
             end
         end
+    end
+
+    def getAdjascentUnvisitedNode(position, visited)
+        # first check left
+        left = @min_heap.left(position)
+        return left if left && !visited.include?(left)
+
+        # otherwise check right
+        right = @min_heap.right(position)
+        return right if right && !visited.include?(right)
+
+        # else visited all adjascent
+        return nil
     end
 
     # Returns the index of the value if found in heap. otherwise -1
